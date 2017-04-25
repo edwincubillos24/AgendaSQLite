@@ -18,6 +18,10 @@ import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.HashMap;
 
 public class MainDActivity extends AppCompatActivity
@@ -61,12 +65,127 @@ public class MainDActivity extends AppCompatActivity
                 limpiar();
                 break;
             case R.id.bBuscar:
+                showContact();
                 break;
             case R.id.bModificar:
+                updateContact();
+                limpiar();
                 break;
             case R.id.bEliminar:
+                deleteContact();
+                limpiar();
                 break;
         }
+    }
+
+    private void showContact() {
+        class ShowContact extends AsyncTask<Void, Void, String>{
+
+            ProgressDialog loading;
+
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+                loading = ProgressDialog.show(MainDActivity.this,"Show...","Wait...",false,false);
+            }
+
+            @Override
+            protected String doInBackground(Void... v) {
+                RequestHandler rh = new RequestHandler();
+                String res = rh.sendGetRequestParam(Config.URL_GET_CONTACT, nombre);
+                return res;
+            }
+
+            @Override
+            protected void onPostExecute(String s) {
+                super.onPostExecute(s);
+                loading.dismiss();
+                showData(s);
+                Toast.makeText(MainDActivity.this, s, Toast.LENGTH_SHORT).show();
+            }
+        }
+        ShowContact ae = new ShowContact();
+        ae.execute();
+    }
+
+    private void showData(String json) {
+
+        try {
+            JSONObject jsonObject = new JSONObject(json);
+            JSONArray result = jsonObject.getJSONArray("result");
+            JSONObject c = result.getJSONObject(0);
+            String telefonoJ = c.getString("telefono");
+            String correo = c.getString("correo");
+            eTelefono.setText(telefonoJ);
+            eCorreo.setText(correo);
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    private void deleteContact() {
+        class DeleteContact extends AsyncTask<Void, Void, String>{
+
+            ProgressDialog loading;
+
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+                loading = ProgressDialog.show(MainDActivity.this,"Delete...","Wait...",false,false);
+            }
+
+            @Override
+            protected String doInBackground(Void... v) {
+                RequestHandler rh = new RequestHandler();
+                String res = rh.sendGetRequestParam(Config.URL_DELETE, nombre);
+                return res;
+            }
+
+            @Override
+            protected void onPostExecute(String s) {
+                super.onPostExecute(s);
+                loading.dismiss();
+                Toast.makeText(MainDActivity.this, s, Toast.LENGTH_SHORT).show();
+            }
+        }
+        DeleteContact ae = new DeleteContact();
+        ae.execute();
+    }
+
+    private void updateContact() {
+        class UpdateContact extends AsyncTask<Void, Void, String>{
+
+            ProgressDialog loading;
+
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+                loading = ProgressDialog.show(MainDActivity.this,"Updating...","Wait...",false,false);
+            }
+
+            @Override
+            protected String doInBackground(Void... v) {
+                HashMap<String, String> params = new HashMap<>();
+                params.put("nombre",nombre);
+                params.put("telefono",telefono);
+                params.put("correo",correo);
+
+                RequestHandler rh = new RequestHandler();
+                String res = rh.sendPostRequest(Config.URL_UPDATE, params);
+                return res;
+            }
+
+            @Override
+            protected void onPostExecute(String s) {
+                super.onPostExecute(s);
+                loading.dismiss();
+                Toast.makeText(MainDActivity.this, s, Toast.LENGTH_SHORT).show();
+            }
+        }
+        UpdateContact ae = new UpdateContact();
+        ae.execute();
     }
 
     private void limpiar() {
@@ -107,7 +226,6 @@ public class MainDActivity extends AppCompatActivity
         }
         AddContact ae = new AddContact();
         ae.execute();
-
     }
 
     @Override
