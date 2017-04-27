@@ -18,23 +18,35 @@ import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
+import java.util.Map;
 
 public class MainDActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    EditText eNombre, eCorreo, eTelefono;
-    String nombre, correo, telefono;
+    EditText eID, eNombre, eCorreo, eTelefono;
+    String idT,nombre, correo, telefono;
+    Contacto contacto;
+    int idC=0;
+
+    DatabaseReference myRef;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_d);
 
+        eID = (EditText) findViewById(R.id.eId);
         eNombre = (EditText) findViewById(R.id.eNombre);
         eCorreo = (EditText) findViewById(R.id.eCorreo);
         eTelefono = (EditText) findViewById(R.id.eTelefono);
@@ -55,27 +67,76 @@ public class MainDActivity extends AppCompatActivity
     public void onClick(View view) {
         int id = view.getId();
 
+        idT = eID.getText().toString();
         nombre = eNombre.getText().toString();
         correo = eCorreo.getText().toString();
         telefono = eTelefono.getText().toString();
 
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+
         switch(id){
             case R.id.bGuardar:
-                addContact();
+                contacto = new Contacto(String.valueOf(idC), nombre, telefono, correo);
+                myRef = database.getReference("contactos").child(String.valueOf(idC));
+                myRef.setValue(contacto);
+                idC++;
+
+            //    addContact(); php y SQL
                 limpiar();
                 break;
             case R.id.bBuscar:
-                showContact();
+                myRef = database.getReference("contactos");
+                myRef.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        if (dataSnapshot.child(String.valueOf(idT)).exists()){
+                            contacto = dataSnapshot.child(String.valueOf(idT)).getValue(Contacto.class);
+                            eNombre.setText(contacto.getNombre());
+                            eCorreo.setText(contacto.getCorreo());
+                            eTelefono.setText(contacto.getTelefono());
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+
+            //    showContact(); php y SQL
                 break;
             case R.id.bModificar:
-                updateContact();
+                myRef = database.getReference("contactos").child(idT);
+
+                Map<String, Object> nuevoNombre = new HashMap<>();
+                nuevoNombre.put("nombre",nombre);
+                myRef.updateChildren(nuevoNombre);
+
+                Map<String, Object> nuevoTelefono = new HashMap<>();
+                nuevoTelefono.put("telefono",telefono);
+                myRef.updateChildren(nuevoTelefono);
+
+                Map<String, Object> nuevoCorreo = new HashMap<>();
+                nuevoCorreo.put("correo",correo);
+                myRef.updateChildren(nuevoCorreo);
+
+            //    updateContact(); php y SQL
                 limpiar();
                 break;
             case R.id.bEliminar:
-                deleteContact();
+                myRef = database.getReference("contactos").child(idT);
+                myRef.removeValue();
+
+            //    deleteContact();  php y SQL
                 limpiar();
                 break;
         }
+    }
+
+    private void limpiar() {
+        eNombre.setText("");
+        eCorreo.setText("");
+        eTelefono.setText("");
     }
 
     private void showContact() {
@@ -186,12 +247,6 @@ public class MainDActivity extends AppCompatActivity
         }
         UpdateContact ae = new UpdateContact();
         ae.execute();
-    }
-
-    private void limpiar() {
-        eNombre.setText("");
-        eCorreo.setText("");
-        eTelefono.setText("");
     }
 
     private void addContact() {

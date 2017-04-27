@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "91126047572",
+    "firebase_url": "https://agendasqlite.firebaseio.com",
+    "project_id": "agendasqlite",
+    "storage_bucket": "agendasqlite.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:91126047572:android:06d64a7f9ebd3171",
+        "android_client_info": {
+          "package_name": "com.edwinacubillos.agendasqlite"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "91126047572-qhb7o4hbtr48ajc43pt643t5nlj95on1.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.edwinacubillos.agendasqlite",
+            "certificate_hash": "53e2fac6a71de8a94cb7aa8d9e11fe0dc29ef839"
+          }
+        },
+        {
+          "client_id": "91126047572-hhfmgmvpnbr343msp24ri4k4mnuui6ha.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBRmth87rq4kPaTxxDG1uT_Rskem7gHgZw"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "91126047572-hhfmgmvpnbr343msp24ri4k4mnuui6ha.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
